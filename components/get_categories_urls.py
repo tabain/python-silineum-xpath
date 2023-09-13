@@ -7,15 +7,18 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
+
+import get_all_categories_product
 trees = []
 options = Options()
-# options.add_argument("--headless=new")
-driver = webdriver.Chrome(options=options)
+options.add_argument("--headless=new")
 
 
 categories_name_urls = {}
 
 def categories_links():
+    driver = webdriver.Chrome(options=options)
+
     driver.get('https://www.aliexpress.com/')
     tree = html.fromstring(driver.page_source)
     sleep(1)
@@ -54,8 +57,11 @@ def categories_links():
     # Data to be written
     with open("json/all_categories.json", "w") as outfile:
         json.dump(categories_name_urls, outfile)
+    driver.close()
+    sleep(1)
+    # ()
 
 
 
 if __name__ == '__main__':
-    categories_links()
+    get_all_categories_product()
