@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
 
 import get_all_categories_product
+import get_product_by_url
 trees = []
 options = Options()
 options.add_argument("--headless=new")
@@ -66,3 +67,4 @@ def categories_links():
 
 if __name__ == '__main__':
     categories_links()
+    # get_product_by_url('https://www.aliexpress.com/item/1005006006686751.html?algo_pvid=c9bb22f8-c096-4dd1-bcf9-c6080995d6b9&algo_exp_id=c9bb22f8-c096-4dd1-bcf9-c6080995d6b9-0&pdp_npi=4%40dis%21PKR%2117226.48%2111024.94%21%21%2158.00%21%21%402101f49e16947215180124204e35d6%2112000035294000588%21sea%21PK%210%21AS&curPageLogUid=loTCPZNuCN79')

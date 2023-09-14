@@ -9,28 +9,30 @@ from fake_useragent import UserAgent
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
+from selenium.common.exceptions import TimeoutException
 import requests
 trees = []
 options = Options()
 options.add_argument("--headless=new")
 options.add_argument("--start-maximized")
+options.add_argument('--disable-browser-side-navigation')
 def get_product_by_url(product_url: str):
     driver = webdriver.Chrome(options=options)
-    driver.get(product_url)
-    sleep(2)
 
+    driver.get(product_url)
+    driver.implicitly_wait(2)
     total_page_height = driver.execute_script("return document.body.scrollHeight")
     browser_window_height = driver.get_window_size(windowHandle='current')['height']
     current_position = driver.execute_script('return window.pageYOffset')
-    while total_page_height - current_position > browser_window_height:
-        sleep(1)
+    while total_page_height - current_position - 200 > browser_window_height:
+        driver.implicitly_wait(1)
         driver.execute_script(f"window.scrollTo({current_position}, {browser_window_height + current_position});")
         current_position = driver.execute_script('return window.pageYOffset')
-        sleep(1)  # It is necessary here to give it some time
+        driver.implicitly_wait(1)  # It is necessary here to give it some time
     # driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
-    sleep(1)
+    driver.implicitly_wait(1)
     driver.execute_script('window.scrollTo(0, 0);')
-    sleep(1)
+    driver.implicitly_wait(1)
     product_details_tree = html.fromstring(driver.page_source)
 
     store_name = "".join(product_details_tree.xpath("//a[@class='store-header--storeName--vINzvPw']/text()"))
@@ -38,7 +40,7 @@ def get_product_by_url(product_url: str):
         store_cred = driver.find_element(By.XPATH, f'//a[text()="{store_name.strip()}"]')
         hover = ActionChains(driver).move_to_element(store_cred)
         hover.perform()
-        sleep(1)
+        driver.implicitly_wait(1)
     product_details_tree = html.fromstring(driver.page_source)
     busi_url = product_details_tree.xpath('//a[text()="Business info"]/@href')
     product_id = product_url.split('.html')[0].split('//www.aliexpress.com/item/')[1]
@@ -100,23 +102,33 @@ def get_product_by_url(product_url: str):
     #     'reviews_count': reviews_count
     # })
     product = {
-            'product_id': product_id,
-            'product_title': product_title,
-            'product_review_sold': product_review_sold,
-            'product_price': product_price,
-            'product_images': product_images,
-            'product_description': product_description,
-            'store_name': store_name,
-            'store_url': store_url,
-            'store_id': store_id,
-            'product_colors': product_colors,
-            'ratting': ratting,
-            'reviews_count': reviews_count,
-            'reviews_comments': reviews_comments,
-        }
+        'product_id': product_id,
+        'product_title': product_title,
+        'product_review_sold': product_review_sold,
+        'product_price': product_price,
+        'product_images': product_images,
+        'product_description': product_description,
+        'store_name': store_name,
+        'store_url': store_url,
+        'store_id': store_id,
+        'product_colors': product_colors,
+        'ratting': ratting,
+        'reviews_count': reviews_count,
+        'reviews_comments': reviews_comments,
+    }
     driver.close()
     sleep(1)
     return product
+
+
+    # driver.set_page_load_timeout(30)
+    # try:
+    #
+    # except TimeoutException:
+    #     print('Page Timeout')
+    #     driver.close()
+    #     sleep(1)
+        # driver.close()
     # print('Product_Count', len(products))
 sys.modules[__name__] = get_product_by_url
 
