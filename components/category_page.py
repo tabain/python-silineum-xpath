@@ -9,10 +9,14 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
+
 trees = []
 options = Options()
 options.add_argument("--headless=new")
+options.add_argument("--start-maximized")
 import get_product_by_url
+import check_valid_url
+
 def category_page(url: str):
     driver = webdriver.Chrome(options=options)
     driver.get(url)
@@ -29,17 +33,19 @@ def category_page(url: str):
                 if (index % 2) == 0:
                     # only one product
                     if len(all_product_href) == 0:
-                        all_product_href.append('https:'+link)
+                        all_product_href.append('https:' + link)
 
         driver.close()
         sleep(1)
 
-
-
-        print(all_product_href[0])
-        product = get_product_by_url(all_product_href[0])
-        return product
+        if len(all_product_href) > 0:
+            is_valid_url = check_valid_url(all_product_href[0])
+            if is_valid_url is True:
+                print(all_product_href[0])
+                product = get_product_by_url(all_product_href[0])
+                return product
     else:
         print('page not found')
+
 
 sys.modules[__name__] = category_page

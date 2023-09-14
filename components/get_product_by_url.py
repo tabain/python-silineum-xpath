@@ -13,21 +13,23 @@ import requests
 trees = []
 options = Options()
 options.add_argument("--headless=new")
-
+options.add_argument("--start-maximized")
 def get_product_by_url(product_url: str):
     driver = webdriver.Chrome(options=options)
     driver.get(product_url)
-    sleep(1)
+    sleep(2)
+
     total_page_height = driver.execute_script("return document.body.scrollHeight")
     browser_window_height = driver.get_window_size(windowHandle='current')['height']
     current_position = driver.execute_script('return window.pageYOffset')
     while total_page_height - current_position > browser_window_height:
+        sleep(1)
         driver.execute_script(f"window.scrollTo({current_position}, {browser_window_height + current_position});")
         current_position = driver.execute_script('return window.pageYOffset')
-        driver.implicitly_wait(2)  # It is necessary here to give it some time
-    driver.implicitly_wait(1)
+        sleep(1)  # It is necessary here to give it some time
+    # driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
+    sleep(1)
     driver.execute_script('window.scrollTo(0, 0);')
-
     sleep(1)
     product_details_tree = html.fromstring(driver.page_source)
 
@@ -36,7 +38,7 @@ def get_product_by_url(product_url: str):
         store_cred = driver.find_element(By.XPATH, f'//a[text()="{store_name.strip()}"]')
         hover = ActionChains(driver).move_to_element(store_cred)
         hover.perform()
-        sleep(5)
+        sleep(1)
     product_details_tree = html.fromstring(driver.page_source)
     busi_url = product_details_tree.xpath('//a[text()="Business info"]/@href')
     product_id = product_url.split('.html')[0].split('//www.aliexpress.com/item/')[1]
