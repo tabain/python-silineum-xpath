@@ -11,6 +11,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
 from selenium.common.exceptions import TimeoutException
 import requests
+import random
+
 trees = []
 options = Options()
 options.add_argument("--headless=new")
@@ -20,19 +22,19 @@ def get_product_by_url(product_url: str):
     driver = webdriver.Chrome(options=options)
 
     driver.get(product_url)
-    driver.implicitly_wait(2)
+    driver.implicitly_wait(random.randrange(6, 10))
     total_page_height = driver.execute_script("return document.body.scrollHeight")
     browser_window_height = driver.get_window_size(windowHandle='current')['height']
     current_position = driver.execute_script('return window.pageYOffset')
     while total_page_height - current_position - 200 > browser_window_height:
-        driver.implicitly_wait(1)
+        driver.implicitly_wait(random.randrange(1, 2))
         driver.execute_script(f"window.scrollTo({current_position}, {browser_window_height + current_position});")
         current_position = driver.execute_script('return window.pageYOffset')
-        driver.implicitly_wait(1)  # It is necessary here to give it some time
+        driver.implicitly_wait(random.randrange(1, 2))  # It is necessary here to give it some time
     # driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
-    driver.implicitly_wait(1)
+    driver.implicitly_wait(random.randrange(1, 2))
     driver.execute_script('window.scrollTo(0, 0);')
-    driver.implicitly_wait(1)
+    driver.implicitly_wait(random.randrange(1, 2))
     product_details_tree = html.fromstring(driver.page_source)
 
     store_name = "".join(product_details_tree.xpath("//a[@class='store-header--storeName--vINzvPw']/text()"))
@@ -40,7 +42,7 @@ def get_product_by_url(product_url: str):
         store_cred = driver.find_element(By.XPATH, f'//a[text()="{store_name.strip()}"]')
         hover = ActionChains(driver).move_to_element(store_cred)
         hover.perform()
-        driver.implicitly_wait(1)
+        driver.implicitly_wait(random.randrange(1, 2))
     product_details_tree = html.fromstring(driver.page_source)
     busi_url = product_details_tree.xpath('//a[text()="Business info"]/@href')
     product_id = product_url.split('.html')[0].split('//www.aliexpress.com/item/')[1]
@@ -55,8 +57,9 @@ def get_product_by_url(product_url: str):
         reviews_count = '0'
     if reviews_count != '0':
         x = requests.get(
-            f'https://feedback.aliexpress.com/pc/searchEvaluation.do?productId={product_id}&lang=en_US&page=1&pageSize=10&filter=all&sort=complex_default')
+            f'https://feedback.aliexpress.com/pc/searchEvaluation.do?productId={product_id}&lang=en_US&page=1&pageSize=100&filter=all&sort=complex_default')
         reviews_comments = x.json()['data']['evaViewList']
+    driver.implicitly_wait(random.randrange(5, 10))
     product_title = ''.join(product_details_tree.xpath('//div[@class="title--wrap--Ms9Zv4A"]/h1/text()'))
     product_review_sold = ''.join(product_details_tree.xpath('//span[@class="product-reviewer-sold"]/text()'))
     product_price = ''.join(product_details_tree.xpath(
@@ -102,6 +105,8 @@ def get_product_by_url(product_url: str):
     #     'reviews_count': reviews_count
     # })
     product = {
+        "product_url": product_url,
+        "platform": "ali_express",
         'product_id': product_id,
         'product_title': product_title,
         'product_review_sold': product_review_sold,
@@ -117,7 +122,7 @@ def get_product_by_url(product_url: str):
         'reviews_comments': reviews_comments,
     }
     driver.close()
-    sleep(1)
+    sleep(random.randrange(1, 2))
     return product
 
 
