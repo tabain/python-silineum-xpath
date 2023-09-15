@@ -22,7 +22,7 @@ def get_product_by_url(product_url: str):
     driver = webdriver.Chrome(options=options)
 
     driver.get(product_url)
-    driver.implicitly_wait(random.randrange(6, 10))
+    driver.implicitly_wait(random.randrange(10, 20))
     total_page_height = driver.execute_script("return document.body.scrollHeight")
     browser_window_height = driver.get_window_size(windowHandle='current')['height']
     current_position = driver.execute_script('return window.pageYOffset')
@@ -57,9 +57,9 @@ def get_product_by_url(product_url: str):
         reviews_count = '0'
     if reviews_count != '0':
         x = requests.get(
-            f'https://feedback.aliexpress.com/pc/searchEvaluation.do?productId={product_id}&lang=en_US&page=1&pageSize=100&filter=all&sort=complex_default')
+            f'https://feedback.aliexpress.com/pc/searchEvaluation.do?productId={product_id}&lang=en_US&page=1&pageSize=10&filter=all&sort=complex_default')
         reviews_comments = x.json()['data']['evaViewList']
-    driver.implicitly_wait(random.randrange(5, 10))
+    # driver.implicitly_wait(random.randrange(10, 10))
     product_title = ''.join(product_details_tree.xpath('//div[@class="title--wrap--Ms9Zv4A"]/h1/text()'))
     product_review_sold = ''.join(product_details_tree.xpath('//span[@class="product-reviewer-sold"]/text()'))
     product_price = ''.join(product_details_tree.xpath(

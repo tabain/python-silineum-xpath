@@ -84,12 +84,10 @@ def page(last_url: str):
         total_page_height = driver.execute_script("return document.body.scrollHeight")
         browser_window_height = driver.get_window_size(windowHandle='current')['height']
         current_position = driver.execute_script('return window.pageYOffset')
-        while total_page_height - current_position > browser_window_height:
-            sleep(random.randrange(1, 2))
-            driver.execute_script(
-                f"window.scrollTo({current_position}, {browser_window_height + current_position});")
+        while total_page_height - current_position - total_page_height/3 > browser_window_height:
+            driver.execute_script(f"window.scrollTo({current_position}, {browser_window_height + current_position});")
             current_position = driver.execute_script('return window.pageYOffset')
-            sleep(random.randrange(1, 2))  # It is necessary here to give it some time
+            sleep(2)  # It is necessary here to give it some time
         # driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
         tree = html.fromstring(driver.page_source)
         for product_tree in tree.xpath('//div[@id="card-list"]'):
@@ -105,16 +103,18 @@ def page(last_url: str):
         c = driver.find_element(By.XPATH, "//li[@class='pagination--paginationLink--2ucXUo6 next-next']")
         if c is not None:
             while c is not None:
-                sleep(random.randrange(3, 5))
+                driver.implicitly_wait(random.randrange(6, 10))
                 c.click()
-                sleep(random.randrange(3, 5))
+                driver.execute_script('window.scrollTo(0, 0);')
+                driver.implicitly_wait(random.randrange(3, 5))
+
                 page(last_url)
-                sleep(2)
+                driver.implicitly_wait(random.randrange(3, 5))
     except :
         # handle the exception
         print("No more pages")
         driver.get(last_url)
-        driver.implicitly_wait(random.randrange(1, 2))
+        driver.implicitly_wait(random.randrange(3, 5))
 
 
 
