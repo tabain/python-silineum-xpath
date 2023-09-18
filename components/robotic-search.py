@@ -17,7 +17,7 @@ import get_product_by_url
 trees = []
 options = Options()
 options.add_argument("--start-maximized")
-# options.add_argument("--headless=new")
+options.add_argument("--headless=new")
 driver = webdriver.Chrome(options=options)
 
 all_product_href = []
@@ -53,14 +53,17 @@ def put_text_in_search(text: str):
     driver.implicitly_wait(5)
     main_tree = html.fromstring(driver.page_source)
     last_url = driver.current_url
-    for li in main_tree.xpath('//*[@class="content"]/ul/li/ul/li'):
-        category = "".join(li.xpath('.//a/text()')).strip()
-        print(category)
-        clk_li = driver.find_element(By.XPATH, f'//a[text()="{category}"]')
-        driver.implicitly_wait(1)
-        clk_li.click()
-        driver.implicitly_wait(1)
-        # sleep(1)
+    if len(main_tree.xpath('//*[@class="content"]/ul/li/ul/li')) > 0:
+        for li in main_tree.xpath('//*[@class="content"]/ul/li/ul/li'):
+            category = "".join(li.xpath('.//a/text()')).strip()
+            print(category)
+            clk_li = driver.find_element(By.XPATH, f'//a[text()="{category}"]')
+            driver.implicitly_wait(1)
+            clk_li.click()
+            driver.implicitly_wait(1)
+            # sleep(1)
+            page(last_url)
+    else:
         page(last_url)
     driver.close()
     sleep(5)
@@ -226,7 +229,7 @@ if __name__ == '__main__':
     # check_ips()
     # business_info_capture('https://shoprenderview.aliexpress.com/credential/showcredential.htm?spm=a2g0o.detail.0.0.278a2rCF2rCFGZ&storeNum=1102937457')
     # get_product_by_url("https://www.aliexpress.com/item/1005005018119615.html?spm=a2g0o.productlist.main.113.18b463e53Id7hk&algo_pvid=45de59df-ae05-4aaa-8dda-ae6f9fb7548c&algo_exp_id=45de59df-ae05-4aaa-8dda-ae6f9fb7548c-56&pdp_npi=4%40dis%21GBP%2147.09%2147.09%21%21%21412.70%21%21%402103011116950393482443055ea725%2112000031357048372%21sea%21UK%210%21ABS&curPageLogUid=cF2K0vrOxkvp")
-    put_text_in_search('lv handbags')
+    put_text_in_search('alias+mae')
     # get_product('https://www.aliexpress.com/item/1005005476023158.html?spm=a2g0o.productlist.main.105.25ae2871cuStnG&algo_pvid=85869fde-b8c4-469d-a676-d75ee2ab051c&algo_exp_id=85869fde-b8c4-469d-a676-d75ee2ab051c-53&pdp_npi=4%40dis%21USD%2171.08%2149.76%21%21%21520.00%21%21%402101ea7116941773388317409ef19a%2112000033233759515%21sea%21PK%210%21AS&curPageLogUid=3X9KT6Em5EqI')
     # get_product('//www.aliexpress.com/item/1005005667996824.html?spm=a2g0o.productlist.main.5.33d7bb07ONTvxT&algo_pvid=afd7f546-8d90-4eea-a2ab-0aa1e7571217&algo_exp_id=afd7f546-8d90-4eea-a2ab-0aa1e7571217-2&pdp_npi=4%40dis%21USD%2150.24%2120.11%21%21%21365.91%21%21%402101c5b116940906651848224ef6e8%2112000034386640358%21sea%21PK%210%21AS&curPageLogUid=5Kwb7k61HPS1#nav-review')
 

@@ -26,7 +26,7 @@ def get_product_by_url(product_url: str):
     total_page_height = driver.execute_script("return document.body.scrollHeight")
     browser_window_height = driver.get_window_size(windowHandle='current')['height']
     current_position = driver.execute_script('return window.pageYOffset')
-    while total_page_height - current_position - 200 > browser_window_height:
+    while total_page_height - current_position - total_page_height/4 > browser_window_height:
         driver.implicitly_wait(random.randrange(1, 2))
         driver.execute_script(f"window.scrollTo({current_position}, {browser_window_height + current_position});")
         current_position = driver.execute_script('return window.pageYOffset')
