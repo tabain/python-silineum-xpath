@@ -12,7 +12,7 @@ from selenium.webdriver import ActionChains
 from selenium.common.exceptions import TimeoutException
 import requests
 import random
-
+from selenium.common.exceptions import NoSuchElementException
 trees = []
 options = Options()
 options.add_argument("--headless=new")
@@ -84,6 +84,27 @@ def get_product_by_url(product_url: str):
     store_name = ''.join(product_details_tree.xpath('//a[@class="store-header--storeName--vINzvPw"]/text()'))
     store_url = ''.join(product_details_tree.xpath('//a[@class="store-header--storeName--vINzvPw"]/@href'))
     store_id = ''.join(store_url).split('/')[len(''.join(store_url).split('/')) - 1]
+    specification = {}
+    try:
+        c = driver.find_element(By.XPATH, '//*[@id="nav-specification"]/button')
+        c.click()
+        driver.implicitly_wait(random.randrange(3, 5))
+        product_details_tree = html.fromstring(driver.page_source)
+        for li in product_details_tree.xpath('//*[@id="nav-specification"]/ul/li'):
+            for div in li.xpath('.//div'):
+                key = ''.join(
+                    div.xpath('.//*[@class="specification--title--UbVeyic"]/span/text()')).lower().strip().replace(' ',
+                                                                                                                   '_')
+                if key != '':
+                    specification[key] = ''.join(div.xpath('.//*[@class="specification--desc--Mz148Bl"]/span/text()'))
+    except NoSuchElementException:
+        for li in product_details_tree.xpath('//*[@id="nav-specification"]/ul/li'):
+            for div in li.xpath('.//div'):
+                key = ''.join(div.xpath('.//*[@class="specification--title--UbVeyic"]/span/text()')).lower().strip().replace(' ', '_')
+                if key != '':
+                    specification[key] = ''.join(div.xpath('.//*[@class="specification--desc--Mz148Bl"]/span/text()'))
+    print(specification)
+
     product_colors = list(
         dict.fromkeys(product_details_tree.xpath('//div[@class="sku-item--skus--MmsF8fD"]/div/img/@alt')))
     # ur = ''.join(busi_url)
@@ -120,6 +141,8 @@ def get_product_by_url(product_url: str):
         'ratting': ratting,
         'reviews_count': reviews_count,
         'reviews_comments': reviews_comments,
+        'specification': specification,
+
     }
     driver.close()
     sleep(random.randrange(1, 2))

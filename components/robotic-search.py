@@ -17,7 +17,6 @@ import get_product_by_url
 trees = []
 options = Options()
 options.add_argument("--start-maximized")
-
 # options.add_argument("--headless=new")
 driver = webdriver.Chrome(options=options)
 
@@ -70,7 +69,7 @@ def put_text_in_search(text: str):
             product = get_product_by_url(f'https:{href}')
             if product is not None:
                 print(f'Product :: {product}')
-                with open(f"json/products/{text.replace(' ', '-')}-{product['product_id']}.json", "w") as outfile:
+                with open(f"json/products/18-sep-{text.replace(' ', '-')}-{product['product_id']}.json", "w") as outfile:
                     json.dump(product, outfile)
 
 
@@ -226,7 +225,8 @@ def get_product(product_url:str):
 if __name__ == '__main__':
     # check_ips()
     # business_info_capture('https://shoprenderview.aliexpress.com/credential/showcredential.htm?spm=a2g0o.detail.0.0.278a2rCF2rCFGZ&storeNum=1102937457')
-    put_text_in_search('luis vuiton bags')
+    # get_product_by_url("https://www.aliexpress.com/item/1005005018119615.html?spm=a2g0o.productlist.main.113.18b463e53Id7hk&algo_pvid=45de59df-ae05-4aaa-8dda-ae6f9fb7548c&algo_exp_id=45de59df-ae05-4aaa-8dda-ae6f9fb7548c-56&pdp_npi=4%40dis%21GBP%2147.09%2147.09%21%21%21412.70%21%21%402103011116950393482443055ea725%2112000031357048372%21sea%21UK%210%21ABS&curPageLogUid=cF2K0vrOxkvp")
+    put_text_in_search('lv handbags')
     # get_product('https://www.aliexpress.com/item/1005005476023158.html?spm=a2g0o.productlist.main.105.25ae2871cuStnG&algo_pvid=85869fde-b8c4-469d-a676-d75ee2ab051c&algo_exp_id=85869fde-b8c4-469d-a676-d75ee2ab051c-53&pdp_npi=4%40dis%21USD%2171.08%2149.76%21%21%21520.00%21%21%402101ea7116941773388317409ef19a%2112000033233759515%21sea%21PK%210%21AS&curPageLogUid=3X9KT6Em5EqI')
     # get_product('//www.aliexpress.com/item/1005005667996824.html?spm=a2g0o.productlist.main.5.33d7bb07ONTvxT&algo_pvid=afd7f546-8d90-4eea-a2ab-0aa1e7571217&algo_exp_id=afd7f546-8d90-4eea-a2ab-0aa1e7571217-2&pdp_npi=4%40dis%21USD%2150.24%2120.11%21%21%21365.91%21%21%402101c5b116940906651848224ef6e8%2112000034386640358%21sea%21PK%210%21AS&curPageLogUid=5Kwb7k61HPS1#nav-review')
 
