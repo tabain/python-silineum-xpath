@@ -125,6 +125,40 @@ def get_product_by_url(product_url: str):
     #     'ratting': ratting,
     #     'reviews_count': reviews_count
     # })
+    seller_summary = {}
+    rating_desc = {}
+    feedback_history = []
+    if store_id != '':
+        store_feedback_url = f'https://www.aliexpress.com/store/feedback-score/{store_id}.html'
+        driver.get(store_feedback_url)
+        frame = driver.find_element(By.XPATH ,"//iframe[@id='detail-displayer']")
+        driver.switch_to.frame(frame)
+        feedback_page_tree = html.fromstring(driver.page_source)
+        for tr_seller_summary in feedback_page_tree.xpath('//*[@id="feedback-summary"]/*[@class="middle middle-seller"]/table/tbody/tr'):
+            key = ''.join(tr_seller_summary.xpath('./th/text()')).replace('(', '_').replace(')', '_').replace(':', '').strip().replace(' ', '_').lower()
+            value = ''.join(tr_seller_summary.xpath('./td/descendant-or-self::*/text()'))
+            seller_summary[key] = value.strip()
+        for tr_seller_rating in feedback_page_tree.xpath('//*[@id="feedback-dsr"]/*[@class="middle middle-seller"]/table/tbody/tr'):
+            key = ''.join(tr_seller_rating.xpath('./th/text()')).replace('(', '_').replace(')', '_').replace(':','').strip().replace(' ', '_').lower()
+            value = ''.join(tr_seller_rating.xpath('./td/*[@class="dsr-text"]/descendant-or-self::*/text()'))
+            value_sec = ''.join(tr_seller_rating.xpath('./td/*[@class="compare-info"]/descendant-or-self::*/text()'))
+            rating_desc[key] = f'{value.strip()} {value_sec.strip()}'
+        keys = []
+        for feedback_key in feedback_page_tree.xpath('//*[@id="feedback-history"]/*[@class="middle"]/table/tbody/*[@class="first"]/*'):
+            key = ''.join(feedback_key.xpath('./text()'))
+            keys.append(key.strip())
+
+        for feedback_tr in feedback_page_tree.xpath('//*[@id="feedback-history"]/*[@class="middle"]/table/tbody/tr[@class!="first"]'):
+            txt_obj = {}
+            values_td = feedback_tr.xpath( './*')
+            for i in range(len(values_td)):
+                # print(i, values_td[i])
+                value = ''.join(values_td[i].xpath('./descendant-or-self::*/text()'))
+                txt_obj[keys[i]] = value.strip()
+            # if idx < len(keys):
+            #     txt_obj[keys[idx]] = value.strip()
+            feedback_history.append(txt_obj)
+
     product = {
         "product_url": product_url,
         "platform": "ali_express",
@@ -142,7 +176,11 @@ def get_product_by_url(product_url: str):
         'reviews_count': reviews_count,
         'reviews_comments': reviews_comments,
         'specification': specification,
-
+        'store_feedback': {
+            'summary': seller_summary,
+            'rating': rating_desc,
+            'history': feedback_history
+        }
     }
     driver.close()
     sleep(random.randrange(1, 2))
