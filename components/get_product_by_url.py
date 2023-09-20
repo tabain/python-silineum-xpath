@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 
 from lxml import html
 from time import sleep
@@ -13,6 +14,7 @@ from selenium.common.exceptions import TimeoutException
 import requests
 import random
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import WebDriverException
 trees = []
 options = Options()
 options.add_argument("--headless=new")
@@ -87,9 +89,14 @@ def get_product_by_url(product_url: str):
     specification = {}
     try:
         c = driver.find_element(By.XPATH, '//*[@id="nav-specification"]/button')
-        c.click()
-        driver.implicitly_wait(random.randrange(3, 5))
-        product_details_tree = html.fromstring(driver.page_source)
+        try:
+            c.click()
+            driver.implicitly_wait(random.randrange(3, 5))
+            product_details_tree = html.fromstring(driver.page_source)
+        except WebDriverException:
+            print("Element is not clickable")
+
+
         for li in product_details_tree.xpath('//*[@id="nav-specification"]/ul/li'):
             for div in li.xpath('.//div'):
                 key = ''.join(
@@ -125,12 +132,32 @@ def get_product_by_url(product_url: str):
     #     'ratting': ratting,
     #     'reviews_count': reviews_count
     # })
+
+    # Feedback and store details
     seller_summary = {}
     rating_desc = {}
     feedback_history = []
+    metric_prefixes = {
+        'T': 1000000000000,
+        'G': 1000000000,
+        'M': 1000000,
+        'K': 1000
+    }
+
+    def num_format(num):
+        magnitude = 0
+        while abs(num) >= 1000:
+            magnitude += 1
+            num /= 1000.0
+        # add more suffixes if you need them
+        return '%.2f%s' % (num, ['', 'K', 'M', 'G', 'T', 'P'][magnitude])
+
+    orders = []
+    total_items = ''
     if store_id != '':
         store_feedback_url = f'https://www.aliexpress.com/store/feedback-score/{store_id}.html'
         driver.get(store_feedback_url)
+        driver.implicitly_wait(10)
         frame = driver.find_element(By.XPATH ,"//iframe[@id='detail-displayer']")
         driver.switch_to.frame(frame)
         feedback_page_tree = html.fromstring(driver.page_source)
@@ -158,7 +185,42 @@ def get_product_by_url(product_url: str):
             # if idx < len(keys):
             #     txt_obj[keys[idx]] = value.strip()
             feedback_history.append(txt_obj)
+        driver.get(f'https://www.aliexpress.com/store/{store_id}/search?SortType=orders_desc')
+        driver.implicitly_wait(10)
+        all_product_page_tree = html.fromstring(driver.page_source)
+        total_items = ''.join(all_product_page_tree.xpath('//*[@class="result-info"]/text()')).strip()
+        driver.get(f'https://www.aliexpress.com/store/top-rated-products/{store_id}.html')
+        driver.implicitly_wait(10)
+        all_product_page_tree = html.fromstring(driver.page_source)
 
+        for li_item in all_product_page_tree.xpath('//ul[@class="items-list util-clearfix"]/li[@class="item"]'):
+            sold = ''.join(li_item.xpath('./*[@class="detail"]/*[@class="recent-order"]/text()')).replace('Orders', '').replace('Order', '').replace('(', '').replace(')', '').strip()
+            if sold is not '':
+
+                if len(re.findall(r"[^\W\d_]+|\d+", sold)) is not 0:
+                    num = 0
+                    for z in re.findall(r"[^\W\d_]+|\d+", sold):
+                        if z.isdigit():
+                            num = int(z)
+                        else:
+                            print(z)
+                            num = num * metric_prefixes[z]
+                    orders.append(num)
+                else:
+                    orders.append(int(sold))
+
+
+
+
+
+
+
+    orders_metric_format = ''
+    if len(orders) > 0:
+        if sum(orders) > 1000:
+            orders_metric_format = num_format(sum(orders))
+        else:
+            orders_metric_format = str(sum(orders))
     product = {
         "product_url": product_url,
         "platform": "ali_express",
@@ -176,11 +238,19 @@ def get_product_by_url(product_url: str):
         'reviews_count': reviews_count,
         'reviews_comments': reviews_comments,
         'specification': specification,
-        'store_feedback': {
-            'summary': seller_summary,
-            'rating': rating_desc,
-            'history': feedback_history
-        }
+        'store': {
+            'store_feedback': {
+                'summary': seller_summary,
+                'rating': rating_desc,
+                'history': feedback_history
+            },
+            'store_name': store_name,
+            'store_url': store_url,
+            'store_id': store_id,
+            'sold': orders_metric_format,
+            'items': total_items
+        },
+
     }
     driver.close()
     sleep(random.randrange(1, 2))

@@ -69,11 +69,14 @@ def put_text_in_search(text: str):
     sleep(5)
     if len(all_product_href) > 0:
         for href in all_product_href:
+            print(href)
             product = get_product_by_url(f'https:{href}')
             if product is not None:
                 print(f'Product :: {product}')
-                with open(f"json/products/19-sep-{text.replace(' ', '-')}-{product['product_id']}.json", "w") as outfile:
+                with open(f"json/products/20-sep-{text.replace(' ', '-')}-{product['product_id']}.json", "w") as outfile:
                     json.dump(product, outfile)
+                # with open(f"json/stores/20-sep-{product['store']['store_id']}.json", "w") as outfile:
+                #     json.dump(product['store'], outfile)
 
 
 def page(last_url: str):
@@ -228,7 +231,7 @@ def get_product(product_url:str):
 if __name__ == '__main__':
     # check_ips()
     # business_info_capture('https://shoprenderview.aliexpress.com/credential/showcredential.htm?spm=a2g0o.detail.0.0.278a2rCF2rCFGZ&storeNum=1102937457')
-    # get_product_by_url("https://www.aliexpress.com/item/1005005072839494.html?pdp_ext_f=%7B%22ship_from%22:%22CN%22,%22sku_id%22:%2212000031528846157%22%7D&&scm=1007.25281.317569.0&scm_id=1007.25281.317569.0&scm-url=1007.25281.317569.0&pvid=68677cb9-ffc0-4fb3-944b-eb452e32e2a9&utparam=%257B%2522process_id%2522%253A%2522standard-item-process-1%2522%252C%2522x_object_type%2522%253A%2522product%2522%252C%2522pvid%2522%253A%252268677cb9-ffc0-4fb3-944b-eb452e32e2a9%2522%252C%2522belongs%2522%253A%255B%257B%2522id%2522%253A%252232195262%2522%252C%2522type%2522%253A%2522dataset%2522%257D%255D%252C%2522pageSize%2522%253A%252212%2522%252C%2522language%2522%253A%2522en%2522%252C%2522scm%2522%253A%25221007.25281.317569.0%2522%252C%2522countryId%2522%253A%2522UK%2522%252C%2522scene%2522%253A%2522TopSelection-Waterfall%2522%252C%2522tpp_buckets%2522%253A%252221669%25230%2523265320%252382_21669%25234190%252319164%2523602_15281%25230%2523317569%25230%2522%252C%2522x_object_id%2522%253A%25221005005072839494%2522%257D&pdp_npi=3%40dis%21GBP%21%EF%BF%A18.56%21%EF%BF%A10.41%21%21%21%21%21%402103228816951275361514634ef3fe%2112000031528846157%21gdf%21%21&spm=a2g0o.tm1000001522.6946203670.d0&aecmd=true")
+    # get_product_by_url("https://www.aliexpress.com/item/1005005758513030.html?algo_pvid=233774c2-4474-49c0-b0c1-89455bb56d88&algo_exp_id=233774c2-4474-49c0-b0c1-89455bb56d88-7&pdp_npi=4%40dis%21PKR%213371.73%211753.43%21%21%2182.34%21%21%402103205316950546433987366e4f75%2112000034262832309%21sea%21PK%210%21ABS&curPageLogUid=epoMI499pZnE")
     put_text_in_search('lv luxury designer handbag')
     # get_product('https://www.aliexpress.com/item/1005005476023158.html?spm=a2g0o.productlist.main.105.25ae2871cuStnG&algo_pvid=85869fde-b8c4-469d-a676-d75ee2ab051c&algo_exp_id=85869fde-b8c4-469d-a676-d75ee2ab051c-53&pdp_npi=4%40dis%21USD%2171.08%2149.76%21%21%21520.00%21%21%402101ea7116941773388317409ef19a%2112000033233759515%21sea%21PK%210%21AS&curPageLogUid=3X9KT6Em5EqI')
     # get_product('//www.aliexpress.com/item/1005005667996824.html?spm=a2g0o.productlist.main.5.33d7bb07ONTvxT&algo_pvid=afd7f546-8d90-4eea-a2ab-0aa1e7571217&algo_exp_id=afd7f546-8d90-4eea-a2ab-0aa1e7571217-2&pdp_npi=4%40dis%21USD%2150.24%2120.11%21%21%21365.91%21%21%402101c5b116940906651848224ef6e8%2112000034386640358%21sea%21PK%210%21AS&curPageLogUid=5Kwb7k61HPS1#nav-review')
