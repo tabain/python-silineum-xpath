@@ -20,9 +20,33 @@ options = Options()
 options.add_argument("--headless=new")
 options.add_argument("--start-maximized")
 options.add_argument('--disable-browser-side-navigation')
+
+
+
+
+def business_info_capture(url: str, driver):
+    actions = ActionChains(driver)
+    split_str = "&storeNum="
+    if len(url.split(split_str)) == 1:
+        split_str = "?storeNum="
+    name = f'screenshot/{url.split(split_str)[len(url.split(split_str)) - 1]}.png'
+    driver.get(url)
+    driver.implicitly_wait(5)
+    try:
+        slide_btn = driver.find_element(By.ID, "nc_1_n1z")
+        slide_ctn = driver.find_element(By.ID, "nc_1__scale_text")
+        actions.move_to_element(slide_btn).click_and_hold().move_by_offset(slide_ctn.size['width'],0).release().perform()
+        driver.implicitly_wait(5)
+        print(driver.get_screenshot_as_file(name))
+    except:
+        print(driver.get_screenshot_as_file(name))
+        # print('System error')
+    # sleep(1)
+    # os.remove(name)
+    # return name
+
 def get_product_by_url(product_url: str):
     driver = webdriver.Chrome(options=options)
-
     driver.get(product_url)
     driver.implicitly_wait(random.randrange(10, 20))
     total_page_height = driver.execute_script("return document.body.scrollHeight")
@@ -157,9 +181,12 @@ def get_product_by_url(product_url: str):
     if store_id != '':
         store_feedback_url = f'https://www.aliexpress.com/store/feedback-score/{store_id}.html'
         driver.get(store_feedback_url)
-        driver.implicitly_wait(10)
-        frame = driver.find_element(By.XPATH ,"//iframe[@id='detail-displayer']")
-        driver.switch_to.frame(frame)
+        driver.implicitly_wait(5)
+        try:
+            frame = driver.find_element(By.XPATH ,"//iframe[@id='detail-displayer']")
+            driver.switch_to.frame(frame)
+        except NoSuchElementException:
+            print('No frame')
         feedback_page_tree = html.fromstring(driver.page_source)
         for tr_seller_summary in feedback_page_tree.xpath('//*[@id="feedback-summary"]/*[@class="middle middle-seller"]/table/tbody/tr'):
             key = ''.join(tr_seller_summary.xpath('./th/text()')).replace('(', '_').replace(')', '_').replace(':', '').strip().replace(' ', '_').lower()
@@ -186,15 +213,15 @@ def get_product_by_url(product_url: str):
             #     txt_obj[keys[idx]] = value.strip()
             feedback_history.append(txt_obj)
         driver.get(f'https://www.aliexpress.com/store/{store_id}/search?SortType=orders_desc')
-        driver.implicitly_wait(10)
+        driver.implicitly_wait(5)
         all_product_page_tree = html.fromstring(driver.page_source)
         total_items = ''.join(all_product_page_tree.xpath('//*[@class="result-info"]/text()')).strip()
         driver.get(f'https://www.aliexpress.com/store/top-rated-products/{store_id}.html')
-        driver.implicitly_wait(10)
+        driver.implicitly_wait(5)
         all_product_page_tree = html.fromstring(driver.page_source)
 
         for li_item in all_product_page_tree.xpath('//ul[@class="items-list util-clearfix"]/li[@class="item"]'):
-            sold = ''.join(li_item.xpath('./*[@class="detail"]/*[@class="recent-order"]/text()')).replace('Orders', '').replace('Order', '').replace('(', '').replace(')', '').strip()
+            sold = ''.join(li_item.xpath('./*[@class="detail"]/*[@class="recent-order"]/text()')).replace('Orders', '').replace('הזמנות', '').replace('Order', '').replace('(', '').replace(')', '').replace(',', '').strip()
             if sold is not '':
 
                 if len(re.findall(r"[^\W\d_]+|\d+", sold)) is not 0:
@@ -203,12 +230,16 @@ def get_product_by_url(product_url: str):
                         if z.isdigit():
                             num = int(z)
                         else:
-                            print(z)
-                            num = num * metric_prefixes[z]
+                            print(f'Metric Prefixes {z}')
+                            if z in list(metric_prefixes.keys()):
+                                print("exist")
+                                num = num * metric_prefixes[z]
                     orders.append(num)
                 else:
                     orders.append(int(sold))
-
+        ur = ''.join(busi_url)
+        if ur != '':
+            business_info_capture('https:' + ur, driver)
 
 
 

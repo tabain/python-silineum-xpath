@@ -73,10 +73,10 @@ def put_text_in_search(text: str):
             product = get_product_by_url(f'https:{href}')
             if product is not None:
                 print(f'Product :: {product}')
-                with open(f"json/products/20-sep-{text.replace(' ', '-')}-{product['product_id']}.json", "w") as outfile:
+                with open(f"json/products/21-sep-{text.replace(' ', '-')}-{product['product_id']}.json", "w") as outfile:
                     json.dump(product, outfile)
-                # with open(f"json/stores/20-sep-{product['store']['store_id']}.json", "w") as outfile:
-                #     json.dump(product['store'], outfile)
+                with open(f"json/stores/21-sep-{product['store']['store_id']}.json", "w") as outfile:
+                    json.dump(product['store'], outfile)
 
 
 def page(last_url: str):
@@ -231,8 +231,9 @@ def get_product(product_url:str):
 if __name__ == '__main__':
     # check_ips()
     # business_info_capture('https://shoprenderview.aliexpress.com/credential/showcredential.htm?spm=a2g0o.detail.0.0.278a2rCF2rCFGZ&storeNum=1102937457')
-    # get_product_by_url("https://www.aliexpress.com/item/1005005758513030.html?algo_pvid=233774c2-4474-49c0-b0c1-89455bb56d88&algo_exp_id=233774c2-4474-49c0-b0c1-89455bb56d88-7&pdp_npi=4%40dis%21PKR%213371.73%211753.43%21%21%2182.34%21%21%402103205316950546433987366e4f75%2112000034262832309%21sea%21PK%210%21ABS&curPageLogUid=epoMI499pZnE")
-    put_text_in_search('lv luxury designer handbag')
+    # get_product_by_url("https://www.aliexpress.com/item/1005005596529397.html")
+    # get_product_by_url("https://www.aliexpress.com/item/1005005596529397.html")
+    put_text_in_search('lv handbags for women')
     # get_product('https://www.aliexpress.com/item/1005005476023158.html?spm=a2g0o.productlist.main.105.25ae2871cuStnG&algo_pvid=85869fde-b8c4-469d-a676-d75ee2ab051c&algo_exp_id=85869fde-b8c4-469d-a676-d75ee2ab051c-53&pdp_npi=4%40dis%21USD%2171.08%2149.76%21%21%21520.00%21%21%402101ea7116941773388317409ef19a%2112000033233759515%21sea%21PK%210%21AS&curPageLogUid=3X9KT6Em5EqI')
     # get_product('//www.aliexpress.com/item/1005005667996824.html?spm=a2g0o.productlist.main.5.33d7bb07ONTvxT&algo_pvid=afd7f546-8d90-4eea-a2ab-0aa1e7571217&algo_exp_id=afd7f546-8d90-4eea-a2ab-0aa1e7571217-2&pdp_npi=4%40dis%21USD%2150.24%2120.11%21%21%21365.91%21%21%402101c5b116940906651848224ef6e8%2112000034386640358%21sea%21PK%210%21AS&curPageLogUid=5Kwb7k61HPS1#nav-review')
 
