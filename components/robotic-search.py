@@ -11,6 +11,7 @@ from fake_useragent import UserAgent
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
+from selenium.webdriver.support import expected_conditions as EC
 import requests
 import get_product_by_url
 
@@ -47,7 +48,33 @@ def business_info_capture(url: str):
     # return name
 
 def put_text_in_search(text: str):
+    wait = WebDriverWait(driver, 5)
+    actions = ActionChains(driver)
     driver.get('https://www.aliexpress.com/')
+    sleep(2)
+
+    try:
+        wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//div[contains(@style,'display: block')]//img[contains(@src,'TB1')]"))).click()
+    except:
+        pass
+
+    try:
+        wait.until(EC.element_to_be_clickable((By.XPATH, "//img[@class='_24EHh']"))).click()
+    except:
+        pass
+    wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "ship-to"))).click()
+
+    wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "shipping-text"))).click()
+
+    ship_to_australia_element = driver.find_element(By.XPATH,
+                                                    "//li[@class='address-select-item ']//span[@class='shipping-text' and text()='United Kingdom']")
+    actions.move_to_element(ship_to_australia_element).perform()
+    sleep(2)
+    ship_to_australia_element.click()
+
+    wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@data-role='save']"))).click()
+    sleep(2)
     driver.find_element(By.ID, 'search-key').send_keys(text)
     c = driver.find_element(By.CLASS_NAME, "search-button")
     driver.implicitly_wait(5)
@@ -72,13 +99,15 @@ def put_text_in_search(text: str):
     if len(all_product_href) > 0:
         for href in all_product_href:
             print(href)
+            # driver.close()
             product = get_product_by_url(f'https:{href}')
             if product is not None:
                 print(f'Product :: {product}')
-                with open(f"json/products/21-sep-{text.replace(' ', '-')}-{product['product_id']}.json", "w") as outfile:
+                with open(f"json/products/25-sep-{text.replace(' ', '-')}-{product['product_id']}.json", "w") as outfile:
                     json.dump(product, outfile)
-                with open(f"json/stores/21-sep-{product['store']['store_id']}.json", "w") as outfile:
+                with open(f"json/stores/25-sep-{product['store']['store_id']}.json", "w") as outfile:
                     json.dump(product['store'], outfile)
+    driver.close()
 
 
 def page(last_url: str):
@@ -233,9 +262,9 @@ def get_product(product_url:str):
 if __name__ == '__main__':
     # check_ips()
     # business_info_capture('https://shoprenderview.aliexpress.com/credential/showcredential.htm?spm=a2g0o.detail.0.0.278a2rCF2rCFGZ&storeNum=1102937457')
-    # get_product_by_url("https://www.aliexpress.com/item/1005005596529397.html")
+    # get_product_by_url("https://www.aliexpress.com/item/1005004580508231.html")
     # get_product_by_url("https://www.aliexpress.com/item/1005005758513030.html?spm=a2g0o.productlist.main.27.1cca49cbNTWXdS&algo_pvid=8e35d312-b219-4e91-ab4c-a0b4ffe3efcd&algo_exp_id=8e35d312-b219-4e91-ab4c-a0b4ffe3efcd-13&pdp_npi=4%40dis%21PKR%213313.39%211723.09%21%21%2182.34%21%21%402101fd4b16954073554711925e6666%2112000034382112176%21sea%21PK%210%21AB&curPageLogUid=ONUueg9efP97")
-    put_text_in_search('lv handbags women')
+    put_text_in_search('jacquemus bag')
     # get_product('https://www.aliexpress.com/item/1005005476023158.html?spm=a2g0o.productlist.main.105.25ae2871cuStnG&algo_pvid=85869fde-b8c4-469d-a676-d75ee2ab051c&algo_exp_id=85869fde-b8c4-469d-a676-d75ee2ab051c-53&pdp_npi=4%40dis%21USD%2171.08%2149.76%21%21%21520.00%21%21%402101ea7116941773388317409ef19a%2112000033233759515%21sea%21PK%210%21AS&curPageLogUid=3X9KT6Em5EqI')
     # get_product('//www.aliexpress.com/item/1005005667996824.html?spm=a2g0o.productlist.main.5.33d7bb07ONTvxT&algo_pvid=afd7f546-8d90-4eea-a2ab-0aa1e7571217&algo_exp_id=afd7f546-8d90-4eea-a2ab-0aa1e7571217-2&pdp_npi=4%40dis%21USD%2150.24%2120.11%21%21%21365.91%21%21%402101c5b116940906651848224ef6e8%2112000034386640358%21sea%21PK%210%21AS&curPageLogUid=5Kwb7k61HPS1#nav-review')
 

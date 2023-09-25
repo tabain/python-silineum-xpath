@@ -15,9 +15,11 @@ import requests
 import random
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 trees = []
 options = Options()
-options.add_argument("--headless=new")
+# options.add_argument("--headless=new")
 options.add_argument("--start-maximized")
 options.add_argument('--disable-browser-side-navigation')
 
@@ -52,10 +54,38 @@ def business_info_capture(url: str, driver):
     # return name
 
 def get_product_by_url(product_url: str):
-    license = ''
     driver = webdriver.Chrome(options=options)
+    wait = WebDriverWait(driver, 10)
+    actions = ActionChains(driver)
     driver.get(product_url)
-    driver.implicitly_wait(random.randrange(10, 20))
+    driver.implicitly_wait(random.randrange(5, 10))
+    sleep(2)
+
+    try:
+        wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//div[contains(@style,'display: block')]//img[contains(@src,'TB1')]"))).click()
+    except:
+        pass
+
+    try:
+        wait.until(EC.element_to_be_clickable((By.XPATH, "//img[@class='_24EHh']"))).click()
+    except:
+        pass
+    wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "ship-to"))).click()
+
+    wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "shipping-text"))).click()
+
+    ship_to_australia_element = driver.find_element(By.XPATH,"//li[@class='address-select-item ']//span[@class='shipping-text' and text()='United Kingdom']")
+    actions.move_to_element(ship_to_australia_element).perform()
+    sleep(2)
+    ship_to_australia_element.click()
+    wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@data-role='save']"))).click()
+    sleep(2)
+
+
+    license = ''
+
+
     total_page_height = driver.execute_script("return document.body.scrollHeight")
     browser_window_height = driver.get_window_size(windowHandle='current')['height']
     current_position = driver.execute_script('return window.pageYOffset')
@@ -145,6 +175,8 @@ def get_product_by_url(product_url: str):
 
     product_colors = list(
         dict.fromkeys(product_details_tree.xpath('//div[@class="sku-item--skus--MmsF8fD"]/div/img/@alt')))
+    product_size = list(
+        dict.fromkeys(product_details_tree.xpath('//div[@class="sku-item--skus--MmsF8fD"]/div/@title')))
     # ur = ''.join(busi_url)
     # if ur != '':
     #     business_info_capture('https:' + ur)
@@ -221,9 +253,11 @@ def get_product_by_url(product_url: str):
             feedback_history.append(txt_obj)
         driver.get(f'https://www.aliexpress.com/store/{store_id}/search?SortType=orders_desc')
         driver.implicitly_wait(5)
+        sleep(1)
         all_product_page_tree = html.fromstring(driver.page_source)
         total_items = ''.join(all_product_page_tree.xpath('//*[@class="result-info"]/text()')).strip()
         driver.get(f'https://www.aliexpress.com/store/top-rated-products/{store_id}.html')
+        sleep(1)
         driver.implicitly_wait(5)
         all_product_page_tree = html.fromstring(driver.page_source)
 
@@ -272,6 +306,7 @@ def get_product_by_url(product_url: str):
         'store_url': store_url,
         'store_id': store_id,
         'product_colors': product_colors,
+        'sizes': product_size,
         'ratting': ratting,
         'reviews_count': reviews_count,
         'reviews_comments': reviews_comments,
