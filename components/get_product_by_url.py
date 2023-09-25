@@ -25,6 +25,7 @@ options.add_argument('--disable-browser-side-navigation')
 
 
 def business_info_capture(url: str, driver):
+    # driver.set_window_size(800, 1024)
     actions = ActionChains(driver)
     split_str = "&storeNum="
     if len(url.split(split_str)) == 1:
@@ -36,16 +37,22 @@ def business_info_capture(url: str, driver):
         slide_btn = driver.find_element(By.ID, "nc_1_n1z")
         slide_ctn = driver.find_element(By.ID, "nc_1__scale_text")
         actions.move_to_element(slide_btn).click_and_hold().move_by_offset(slide_ctn.size['width'],0).release().perform()
-        driver.implicitly_wait(5)
+        driver.implicitly_wait(15)
         print(driver.get_screenshot_as_file(name))
+        # return driver.get_screenshot_as_base64()
+        return name
+
     except:
         print(driver.get_screenshot_as_file(name))
+        return name
+        # return driver.get_screenshot_as_base64()
         # print('System error')
     # sleep(1)
     # os.remove(name)
     # return name
 
 def get_product_by_url(product_url: str):
+    license = ''
     driver = webdriver.Chrome(options=options)
     driver.get(product_url)
     driver.implicitly_wait(random.randrange(10, 20))
@@ -239,7 +246,7 @@ def get_product_by_url(product_url: str):
                     orders.append(int(sold))
         ur = ''.join(busi_url)
         if ur != '':
-            business_info_capture('https:' + ur, driver)
+            license = business_info_capture('https:' + ur, driver)
 
 
 
@@ -279,7 +286,8 @@ def get_product_by_url(product_url: str):
             'store_url': store_url,
             'store_id': store_id,
             'sold': orders_metric_format,
-            'items': total_items
+            'items': total_items,
+            'license_image': license
         },
 
     }

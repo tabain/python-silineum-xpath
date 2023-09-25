@@ -24,6 +24,7 @@ all_product_href = []
 products =[]
 last_url =''
 def business_info_capture(url: str):
+    driver.set_window_size(600, 900)
     actions = ActionChains(driver)
     split_str = "&storeNum="
     if len(url.split(split_str)) == 1:
@@ -31,6 +32,7 @@ def business_info_capture(url: str):
     name = f'screenshot/{url.split(split_str)[len(url.split(split_str)) - 1]}.png'
     driver.get(url)
     sleep(1)
+
     try:
         slide_btn = driver.find_element(By.ID, "nc_1_n1z")
         slide_ctn = driver.find_element(By.ID, "nc_1__scale_text")
@@ -232,8 +234,8 @@ if __name__ == '__main__':
     # check_ips()
     # business_info_capture('https://shoprenderview.aliexpress.com/credential/showcredential.htm?spm=a2g0o.detail.0.0.278a2rCF2rCFGZ&storeNum=1102937457')
     # get_product_by_url("https://www.aliexpress.com/item/1005005596529397.html")
-    # get_product_by_url("https://www.aliexpress.com/item/1005005596529397.html")
-    put_text_in_search('lv handbags for women')
+    # get_product_by_url("https://www.aliexpress.com/item/1005005758513030.html?spm=a2g0o.productlist.main.27.1cca49cbNTWXdS&algo_pvid=8e35d312-b219-4e91-ab4c-a0b4ffe3efcd&algo_exp_id=8e35d312-b219-4e91-ab4c-a0b4ffe3efcd-13&pdp_npi=4%40dis%21PKR%213313.39%211723.09%21%21%2182.34%21%21%402101fd4b16954073554711925e6666%2112000034382112176%21sea%21PK%210%21AB&curPageLogUid=ONUueg9efP97")
+    put_text_in_search('lv handbags women')
     # get_product('https://www.aliexpress.com/item/1005005476023158.html?spm=a2g0o.productlist.main.105.25ae2871cuStnG&algo_pvid=85869fde-b8c4-469d-a676-d75ee2ab051c&algo_exp_id=85869fde-b8c4-469d-a676-d75ee2ab051c-53&pdp_npi=4%40dis%21USD%2171.08%2149.76%21%21%21520.00%21%21%402101ea7116941773388317409ef19a%2112000033233759515%21sea%21PK%210%21AS&curPageLogUid=3X9KT6Em5EqI')
     # get_product('//www.aliexpress.com/item/1005005667996824.html?spm=a2g0o.productlist.main.5.33d7bb07ONTvxT&algo_pvid=afd7f546-8d90-4eea-a2ab-0aa1e7571217&algo_exp_id=afd7f546-8d90-4eea-a2ab-0aa1e7571217-2&pdp_npi=4%40dis%21USD%2150.24%2120.11%21%21%21365.91%21%21%402101c5b116940906651848224ef6e8%2112000034386640358%21sea%21PK%210%21AS&curPageLogUid=5Kwb7k61HPS1#nav-review')
 
